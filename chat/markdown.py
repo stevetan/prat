@@ -10,6 +10,28 @@ import cgi
 import re
 
 class HtmlPygmentsRenderer(HtmlRenderer):
+  def youtubeToken(self, matchobj):
+    print matchobj.group('id')
+    return "youtube:%s" % matchobj.group('id')
+
+  def youtubeEmbed(self, matchobj):
+    print matchobj.group('id')
+    return '''<iframe width="480" height="295" src="https://www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>''' % matchobj.group('id')
+
+  def preprocess(self, text):
+    print re.findall(r'(https?://)?(www\.)?(youtube\.com/watch\?\w*v=)(?P<id>[0-9A-Za-z]+)\w*', text)
+    text = re.sub(r'(https?://)?(www\.)?(youtube\.com/watch\?\w*v=)(?P<id>[0-9A-Za-z]+)\w*',
+      self.youtubeToken,
+      text)
+    return text
+
+  def postprocess(self, text):
+    print re.findall(r'(youtube:)(?P<id>[0-9A-Za-z]+)', text)
+    text = re.sub(r'(youtube:)(?P<id>[0-9A-Za-z]+)',
+      self.youtubeEmbed,
+      text)
+    return text
+
   def normal_text(self, text):
     escaped_text = cgi.escape(text)
 
